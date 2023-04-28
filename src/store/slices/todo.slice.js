@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-    tasks: [],
+    tasks: JSON.parse(localStorage.getItem("tasks")) ?? [],
     isShowModal: false,
     taskToEdit: null
 }
@@ -14,7 +14,9 @@ const todoSlice = createSlice({
             state.isShowModal = !state.isShowModal
         },
         addTask: (state, action) => {
-            state.tasks.push(action.payload)
+            const newTasks = [...state.tasks, action.payload]
+            localStorage.setItem("tasks", JSON.stringify(newTasks))
+            state.tasks = newTasks
         },
         changeDoneTask: (state, action) => {
             const newTasks = state.tasks.map((task) => {
@@ -24,14 +26,27 @@ const todoSlice = createSlice({
                     return task
                 }
             })
+            localStorage.setItem("tasks", JSON.stringify(newTasks))
             state.tasks = newTasks
         },
         deleteTask: (state, action) => {
             const newTasks = state.tasks.filter((task) => task.id !== action.payload)
+            localStorage.setItem("tasks", JSON.stringify(newTasks))
             state.tasks = newTasks
         },
         setTaskToEdit: (state, action) => {
             state.taskToEdit = action.payload
+        },
+        updateTask: (state, action) => {
+            const newTasks = state.tasks.map((task) => {
+                if(action.payload.id === task.id) {
+                    return action.payload
+                } else {
+                    return task
+                }
+            })
+            localStorage.setItem("tasks", JSON.stringify(newTasks))
+            state.tasks = newTasks
         }
         
         
@@ -40,6 +55,6 @@ const todoSlice = createSlice({
 
 })
 
-export const {changeShowModal, addTask, changeDoneTask, deleteTask, setTaskToEdit  } = todoSlice.actions
+export const {changeShowModal, addTask, changeDoneTask, deleteTask, setTaskToEdit, updateTask } = todoSlice.actions
 
 export default todoSlice.reducer
